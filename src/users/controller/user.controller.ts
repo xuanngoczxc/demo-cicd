@@ -4,7 +4,6 @@ import { CreateUserDto } from "../dto/create-user.dto";
 import { PaginationDto } from "../dto/pagination.dto";
 import { User } from "../entity/user.entity";
 import { ApiQuery } from "@nestjs/swagger";
-import { LoggerMiddleware } from "src/utils/logger.middleware";
 import { UpdateUserDto } from "../dto/update-user.dto";
 import { Roles } from "src/auth/decorators/roles.decorator";
 import { Role } from "src/auth/enums/rol.enum";
@@ -33,24 +32,16 @@ export class UserController {
     async findAll(
         @Query() paginationDto: PaginationDto,
         @Query('search') search?: string,
-    ): Promise<{
-        users: User[];
-        total: number;
-        totalPages: number;
-        currentPage: number;
+    ): Promise<{ users: User[]; total: number; totalPages: number; currentPage: number;
     }> {
         return await this.userService.findAll(paginationDto, search);
-    }
+    } 
 
     @Get('pagination')
     @UsePipes(new ValidationPipe({ transform: true }))
     async searchPaginated(
         @Query() paginationDto: PaginationDto,
-    ): Promise<{
-        users: User[];
-        total: number;
-        totalPages: number;
-        currentPage: number;
+    ): Promise<{ users: User[]; total: number; totalPages: number; currentPage: number;
     }> {
         const result = await this.userService.findAllPaginated(paginationDto);
         return result;
@@ -66,23 +57,9 @@ export class UserController {
         return this.userService.findOne(id);
     }
 
-    // @Get(':identifier')
-    // async findUser(@Param('identifier') identifier: string | number): Promise<User | User[]> {
-    //     if (!isNaN(Number(identifier))) {
-    //         return this.userService.findOne(Number(identifier));
-    //     }
-    //     return this.userService.findSearchUsers(identifier as string);
-    // }
-
-    // @Put(':id')
-    // update(
-    //     @Param('id', ParseIntPipe) id:number,
-    //     @Body() updateUserDto: UpdateUserDto,
-    // ): Promise<User> {
-    //     return this.userService.update(id, updateUserDto);
-    // }
-
     @Put(':id')
+    @Roles(Role.Admin)
+    @UseGuards(AuthGuard, RolesGuard)
     async update(
         @Param('id') id: number,
         @Body() updateUserDto: UpdateUserDto,
@@ -92,6 +69,8 @@ export class UserController {
     }
   
     @Delete(':id')
+    @Roles(Role.Admin)
+    @UseGuards(AuthGuard, RolesGuard)
     remove(@Param('id') id: string) {
         return this.userService.remove(+id);
     }
