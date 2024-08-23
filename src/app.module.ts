@@ -14,16 +14,15 @@ import { RolesGuard } from './auth/guard/roles.guard';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './auth/constants/jwt.constant';
 
-
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
+      host: 'db-cicd.cn2ewewyojv2.ap-southeast-1.rds.amazonaws.com',
       port: 5432,
       username: 'postgres',
-      password: '12345',
-      database: 'Relation',
+      password: '0335057747',
+      database: 'postgres',
       entities: [User, Photo],
       synchronize: true,
     }),UsersModule, PhotoModule, AuthModule,
