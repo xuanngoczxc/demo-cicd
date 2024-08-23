@@ -6,10 +6,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/entity/user.entity';
 import { Photo } from './users/entity/photo.entity';
 import { PhotoModule } from './users/module/photo.module';
-import { LoggerMiddleware } from './utils/logger.middleware';
 import { AuthModule } from './auth/auth.module';
+import { RequestLoggerMiddleware } from './utils/request-logger.middleware';
 import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './auth/guard/auth.guard';
 import { RolesGuard } from './auth/guard/roles.guard';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from './auth/constants/jwt.constant';
+
 
 @Module({
   imports: [
@@ -22,19 +26,27 @@ import { RolesGuard } from './auth/guard/roles.guard';
       database: 'Relation',
       entities: [User, Photo],
       synchronize: true,
-      // logging: true
-    }),UsersModule, PhotoModule, AuthModule
+    }),UsersModule, PhotoModule, AuthModule,
+    JwtModule.register({
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '30m'}
+    }),
   ],
   controllers: [AppController],
   providers: [
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: RolesGuard
-    // },
-    AppService]
+    AppService,
+      // {
+      //   provide: APP_GUARD,
+      //   useClass: AuthGuard,
+      // },
+      // {
+      //   provide: APP_GUARD,
+      //   useClass: RolesGuard,
+      // },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-      consumer.apply(LoggerMiddleware).forRoutes('*');
+    consumer.apply(RequestLoggerMiddleware).forRoutes('*');
   }
 }

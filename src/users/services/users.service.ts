@@ -7,6 +7,7 @@ import { PaginationDto } from '../dto/pagination.dto';
 import { Photo } from '../entity/photo.entity';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { RegisterUserDto } from '../dto/register-user.dto';
+import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class UsersService {
@@ -32,7 +33,9 @@ export class UsersService {
   // }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const user = this.userRepository.create(createUserDto);
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10)
+    const user = this.userRepository.create({
+      ...createUserDto, password: hashedPassword});
     return this.userRepository.save(user);
   }
 
@@ -43,6 +46,10 @@ export class UsersService {
   async findOneByEmail(email: string) {
     return await this.userRepository.findOneBy({ email });
   }
+
+  // async findOneById(id: number): Promise<User | undefined> {
+  //   return this.userRepository.findOne({ where: {id} });
+  // }
 
   async findAllPaginated(paginationDto: PaginationDto): Promise<{
     users: User[];
@@ -125,11 +132,9 @@ export class UsersService {
       where: { id },
       relations: ['photos'],
     });
-  
     if (!user) {
       throw new Error('User not found');
     }
-
     if (photoUpdates) {
       for (const photoUpdate of photoUpdates) {
         const photo = user.photos.find(p => p.id === photoUpdate.id);
@@ -142,7 +147,6 @@ export class UsersService {
         }
       }
     }
-    
     return this.userRepository.findOne({ where: { id }, relations: ['photos'] });
   }
 
