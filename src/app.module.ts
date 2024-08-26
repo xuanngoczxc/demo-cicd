@@ -18,11 +18,11 @@ import { jwtConstants } from './auth/constants/jwt.constant';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'db-cicd.cn2ewewyojv2.ap-southeast-1.rds.amazonaws.com',
+      host: 'cidedb.cn2ewewyojv2.ap-southeast-1.rds.amazonaws.com',
       port: 5432,
       username: 'postgres',
       password: '04052003',
-      database: 'Relation',
+      database: 'postgres',
       entities: [User, Photo],
       synchronize: true,
     }),UsersModule, PhotoModule, AuthModule,
