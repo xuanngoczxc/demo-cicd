@@ -5,7 +5,9 @@ jobs:
     docker:
       - image: arvindr226/alpine-ssh
     steps:
-      - run: ssh -oStrictHostKeyChecking=no -v $USER@$DNS "./deploy.sh"
+      - run:
+          name: Execute deploy script on remote server
+          command: ssh -oStrictHostKeyChecking=no -v $USER@$DNS "bash /home/ubuntu/deploy.sh"
 
 workflows:
   deploy-to-ec2:
