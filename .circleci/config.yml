@@ -7,6 +7,6 @@ workflows:
 jobs:
   runner:
     machine: true
-    resource_class: <namespace>/<resource-class>
+    resource_class: aqtech/cicd-class
     steps:
       - run: echo "Hi I'm on Runners!"
