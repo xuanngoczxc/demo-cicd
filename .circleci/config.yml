@@ -1,7 +1,5 @@
 version: 2.1
 
-jobs:
-
   deploy:
     machine: true
     resource_class: large
