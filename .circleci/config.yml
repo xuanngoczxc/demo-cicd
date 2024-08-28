@@ -2,12 +2,22 @@ version: 2.1
 
 jobs:
   deploy:
-    docker:
-      - image: arvindr226/alpine-ssh
+    machine: true
+    resource_class: large
+    working_directory: ~/be-project/
     steps:
-      - run: ssh -oStrictHostKeyChecking=no -v $USER@$DNS "../deploy.sh"
+      - checkout
+      - run:
+          name: Deploy to EC2
+          command: |
+            echo $(ip addr)
+            # ssh -oStrictHostKeyChecking=no -v $USER@$DNS "./deploy.sh"
 
 workflows:
   deploy-to-ec2:
     jobs:
-      - deploy
+      - deploy:
+          filters:
+            branches:
+              only:
+                - develop
