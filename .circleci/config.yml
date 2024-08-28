@@ -3,15 +3,10 @@ version: 2.1
 workflows:
   build-workflow:
     jobs:
-      - runner:
-          filters:
-            branches:
-              only:
-                - develop
-
+      - runner
 jobs:
   runner:
     machine: true
-    resource_class: aqtech/cicd-class
+    resource_class: <namespace>/<resource-class>
     steps:
       - run: echo "Hi I'm on Runners!"
