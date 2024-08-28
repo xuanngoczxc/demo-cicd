@@ -8,6 +8,7 @@ workflows:
             branches:
               only:
                 - develop
+                
 jobs:
   runner:
     machine: true
