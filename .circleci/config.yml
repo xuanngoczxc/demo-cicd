@@ -4,7 +4,7 @@ jobs:
 
   deploy:
     machine: true
-    resource_class: aqtech/test-cicd
+    resource_class: large
     working_directory: ~/be-project/
     steps:
       - checkout
