@@ -6,7 +6,7 @@ jobs:
       - image: arvindr226/alpine-ssh
     steps:
       - run:
-          name: Execute deploy script on remote server
+          name: test-cicd
           command: ssh -oStrictHostKeyChecking=no -v $USER@$DNS "bash /home/ubuntu/deploy.sh"
 
 workflows:
