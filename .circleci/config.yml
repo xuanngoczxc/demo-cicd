@@ -5,9 +5,7 @@ jobs:
     docker:
       - image: arvindr226/alpine-ssh
     steps:
-      - run:
-          name: Execute deploy script on remote server
-          command: ssh -oStrictHostKeyChecking=no -v $USER@$DNS "bash /home/ubuntu/deploy.sh"
+      - run: ssh -oStrictHostKeyChecking=no -v $USER@$DNS "./deploy.sh"
     environment:
       USER: ubuntu           # Set your SSH username
       DNS: ec2-18-141-137-219.ap-southeast-1.compute.amazonaws.com
