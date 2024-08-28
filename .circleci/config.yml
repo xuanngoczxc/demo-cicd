@@ -1,13 +1,23 @@
 version: 2.1
 
-workflows:
-  build-workflow:
-    jobs:
-      - runner
 jobs:
-  runner:
+  deploy:
     machine: true
-    resource_class: aqtech/cicd-class
+    resource_class: large
+    working_directory: ~/be-project/
     steps:
-      - run: echo "Hi I'm on Runners!"
-      
+      - checkout
+      - run:
+          name: Deploy to EC2
+          command: |
+            echo $(ip addr)
+            # ssh -oStrictHostKeyChecking=no -v $USER@$DNS "./deploy.sh"
+
+workflows:
+  deploy-to-ec2:
+    jobs:
+      - deploy:
+          filters:
+            branches:
+              only:
+                - develop
