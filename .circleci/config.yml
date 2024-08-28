@@ -1,7 +1,7 @@
 version: 2.1
 
 workflows:
-  deploy-to-ec2:
+  build-workflow:
     jobs:
       - deploy:
           filters:
