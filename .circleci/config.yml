@@ -25,10 +25,15 @@ jobs:
           pkg-manager: npm
       - run:
           name: Run all tests
-          command: npm run start:dev
+          command: npm test
       - run:
           name: Build application
           command: npm run build
+      - run:
+          name: Show all API endpoints
+          command: |
+            echo "Listing all API endpoints in the project:"
+            grep -r -i "app\.(get|post|put|delete|patch)" ./src
 
   deploy:
     docker:
