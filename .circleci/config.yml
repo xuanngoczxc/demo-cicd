@@ -1,12 +1,117 @@
 version: 2.1
 
+orbs:
+  node: circleci/node@5.2.0
+  bun: ksylvest/bun@1.0.1
+
 workflows:
-  build-workflow:
+  dev_test_staging:
     jobs:
-      - runner
+      - build:
+          filters: # Run the build job when dev, test, or staging branches are changed
+            branches:
+              only:
+                - develop
+
+      # Dev branch workflow
+      - deploy_dev:
+          filters: # Run the deploy_dev job only when the dev branch is changed
+            branches:
+              only:
+                - develop
+          requires: # The deploy_dev job requires the build job to complete first
+            - build
+
+      # Test and Staging branchs workflow
+      - approval_deploy: # Requires approval before deploying
+          type: approval
+          filters:
+            branches:
+              only:
+                - develop
+          requires:
+            - build
+
+      - deploy_test:
+          filters:
+            branches:
+              only:
+                - develop
+          requires:
+            - approval_deploy
+
+      - deploy_staging:
+          filters:
+            branches:
+              only:
+                - staging
+          requires:
+            - approval_deploy
+
 jobs:
-  runner:
+  build:
+    machine: true # Use a CircleCI machine executor
+    resource_class: aqtech/cicd-class
+    environment:
+      WORK_DIR: /home/circleci/influencer_<< pipeline.git.branch >> # Working directory path based on the git branch
+      ENV: << pipeline.git.branch >> # Environment variable representing the current branch
+    steps:
+      - checkout # Check out the source code from the repository
+      - node/install: # Install Node.js version 20.11.0
+          node-version: "20.11.0"
+      - bun/install # Install Bun
+      - run:
+          name: Setup workspace
+          command: |
+            rm -rf ${WORK_DIR} # Remove the old working directory
+            shopt -s extglob dotglob
+            rsync -a --delete * ${WORK_DIR} # Sync the source code with the working directory shopt -u dotglob
+            shopt -u dotglob
+      - run:
+          name: Build the Project
+          command: |
+            cd ${WORK_DIR}
+            if [ "${ENV}" == "dev" ]; then echo "VITE_API_URL=${API_URL_DEV}" >> .env; fi # Insert api_url based on env
+            if [ "${ENV}" == "test" ]; then echo "VITE_API_URL=${API_URL_TEST}" >> .env; fi
+            if [ "${ENV}" == "staging" ]; then echo "VITE_API_URL=${API_URL_STAGING}" >> .env; fi
+            bun i
+            bun run build
+
+  deploy_dev:
     machine: true
     resource_class: aqtech/cicd-class
+    environment:
+      WORK_DIR: /home/circleci/influencer_<< pipeline.git.branch >>
     steps:
-      - run: echo "Hi I'm on Runners!"
+      - run:
+          name: "Deploy to Dev site"
+          command: |
+            rm -rf /var/www/cms/dev
+            mkdir -p /var/www/cms/dev
+            rsync -a ${WORK_DIR}/dist/ /var/www/cms/dev
+
+  deploy_test:
+    machine: true
+    resource_class: aqtech/cicd-class
+    environment:
+      WORK_DIR: /home/circleci/influencer_<< pipeline.git.branch >>
+    steps:
+      - run:
+          name: "Deploy to Test site"
+          command: |
+            rm -rf /var/www/cms/test
+            mkdir -p /var/www/cms/test
+            rsync -a ${WORK_DIR}/dist/ /var/www/cms/test
+
+  deploy_staging:
+    machine: true
+    resource_class: aqtech/cicd-class
+    environment:
+      WORK_DIR: /home/circleci/influencer_<< pipeline.git.branch >>
+    steps:
+      - run:
+          name: "Deploy to Staging site"
+          command: |
+            rm -rf /var/www/cms/staging
+            mkdir -p /var/www/cms/staging
+            rsync -a ${WORK_DIR}/dist/ /var/www/cms/staging
