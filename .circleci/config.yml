@@ -1,12 +1,46 @@
+
 version: 2.1
 
+orbs:
+  node: circleci/node@5.0.2
+
 workflows:
-  build-workflow:
+  build-test-deploy:
     jobs:
-      - runner
+      - build-and-test
+      - deploy:
+          requires:
+            - build-and-test
+          filters:
+            branches:
+              only: develop
+
 jobs:
-  runner:
-    machine: true
+  build-and-test:
+    docker:
+      - image: cimg/node:18.1.0
     resource_class: aqtech/cicd-class
     steps:
-      - run: echo "Hi I'm on Runners!"
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Run tests
+          command: npm test
+      - run:
+          name: Build application
+          command: npm run build
+
+  deploy:
+    docker:
+      - image: cimg/base:stable
+    resource_class: aqtech/cicd-class
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.24
+      - run:
+          name: Deploy to production
+          command: |
+            # Add deployment steps here
+            echo "Deploying to production"
