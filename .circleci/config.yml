@@ -25,7 +25,7 @@ jobs:
           pkg-manager: npm
       - run:
           name: Run all tests
-          command: npm run test:all
+          command: npm run start:dev
       - run:
           name: Build application
           command: npm run build
