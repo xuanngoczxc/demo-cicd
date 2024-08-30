@@ -19,14 +19,13 @@ jobs:
   build-and-test:
     docker:
       - image: cimg/node:18.1.0
-    resource_class: aqtech/cicd-class
     steps:
       - checkout
       - node/install-packages:
           pkg-manager: npm
       - run:
-          name: Run tests
-          command: npm test
+          name: Run all tests
+          command: npm run test:all
       - run:
           name: Build application
           command: npm run build
@@ -34,7 +33,6 @@ jobs:
   deploy:
     docker:
       - image: cimg/base:stable
-    resource_class: aqtech/cicd-class
     steps:
       - checkout
       - setup_remote_docker:
