@@ -3,12 +3,7 @@ version: 2.1
 workflows:
   build-workflow:
     jobs:
-      - runner:
-          filters:
-            branches:
-              only:
-                - develop
-                
+      - runner
 jobs:
   runner:
     machine: true
