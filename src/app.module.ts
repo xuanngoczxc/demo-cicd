@@ -33,15 +33,7 @@ import { jwtConstants } from './auth/constants/jwt.constant';
   ],
   controllers: [AppController],
   providers: [
-    AppService,
-      // {
-      //   provide: APP_GUARD,
-      //   useClass: AuthGuard,
-      // },
-      // {
-      //   provide: APP_GUARD,
-      //   useClass: RolesGuard,
-      // },
+    AppService
   ],
 })
 export class AppModule implements NestModule {
